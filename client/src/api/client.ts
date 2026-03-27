@@ -250,4 +250,12 @@ export const backupApi = {
   setAutoSettings: (settings: Record<string, unknown>) => apiClient.put('/backup/auto-settings', settings).then(r => r.data),
 }
 
+export const importApi = {
+  importAita: (file: File) => {
+    const form = new FormData()
+    form.append('file', file)
+    return apiClient.post('/import/aita', form, { headers: { 'Content-Type': 'multipart/form-data' } }).then(r => r.data)
+  },
+}
+
 export default apiClient
