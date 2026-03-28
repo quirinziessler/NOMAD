@@ -455,24 +455,32 @@ router.post('/', authenticate, importRateLimiter, upload.single('file'), (req: R
       }
 
       // Create airport places so Atlas can derive visited countries from imported flight data.
-      const airportsInTrip = new Set<string>();
-      if (trip.originAirport) airportsInTrip.add(trip.originAirport.toUpperCase());
-      if (trip.destinationAirport) airportsInTrip.add(trip.destinationAirport.toUpperCase());
-      for (const flight of trip.flights) {
-        if (flight.origin) airportsInTrip.add(flight.origin.toUpperCase());
-        if (flight.destination) airportsInTrip.add(flight.destination.toUpperCase());
-      }
-      for (const airport of airportsInTrip) {
-        const countryCode = resolveCountryCodeForAirport(airport);
-        if (!countryCode) {
-          unresolvedAirports.add(airport);
-          continue;
+      // This can be disabled per request by passing ?skipAirportPlaces=true in the query string.
+      const skipAirportPlacesParam = (req.query as any)?.skipAirportPlaces;
+      const skipAirportPlaces =
+        typeof skipAirportPlacesParam === 'string' &&
+        skipAirportPlacesParam.toLowerCase() === 'true';
+
+      if (!skipAirportPlaces) {
+        const airportsInTrip = new Set<string>();
+        if (trip.originAirport) airportsInTrip.add(trip.originAirport.toUpperCase());
+        if (trip.destinationAirport) airportsInTrip.add(trip.destinationAirport.toUpperCase());
+        for (const flight of trip.flights) {
+          if (flight.origin) airportsInTrip.add(flight.origin.toUpperCase());
+          if (flight.destination) airportsInTrip.add(flight.destination.toUpperCase());
         }
-        insertPlace.run(
-          tripId,
-          `${airport} Airport`,
-          `${airport}, ${countryCode}`,
-        );
+        for (const airport of airportsInTrip) {
+          const countryCode = resolveCountryCodeForAirport(airport);
+          if (!countryCode) {
+            unresolvedAirports.add(airport);
+            continue;
+          }
+          insertPlace.run(
+            tripId,
+            `${airport} Airport`,
+            `${airport}, ${countryCode}`,
+          );
+        }
       }
 
       importedTrips++;
