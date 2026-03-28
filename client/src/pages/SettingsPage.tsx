@@ -6,8 +6,8 @@ import { useTranslation } from '../i18n'
 import Navbar from '../components/Layout/Navbar'
 import CustomSelect from '../components/shared/CustomSelect'
 import { useToast } from '../components/shared/Toast'
-import { Save, Map, Palette, User, Moon, Sun, Monitor, Shield, Camera, Trash2, Lock } from 'lucide-react'
-import { authApi, adminApi } from '../api/client'
+import { Save, Map, Palette, User, Moon, Sun, Monitor, Shield, Camera, Trash2, Lock, Upload } from 'lucide-react'
+import { authApi, adminApi, importApi } from '../api/client'
 import type { LucideIcon } from 'lucide-react'
 import type { UserWithOidc } from '../types'
 import { getApiErrorMessage } from '../types'
@@ -78,6 +78,10 @@ export default function SettingsPage(): React.ReactElement {
       if (config?.oidc_only_mode) setOidcOnlyMode(true)
     }).catch(() => {})
   }, [])
+
+  // Import
+  const [importing, setImporting] = useState<boolean>(false)
+  const importFileRef = React.useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     setMapTileUrl(settings.map_tile_url || '')
@@ -151,6 +155,30 @@ export default function SettingsPage(): React.ReactElement {
       toast.error(err instanceof Error ? err.message : 'Error')
     } finally {
       setSaving(s => ({ ...s, profile: false }))
+    }
+  }
+
+  const handleImportAita = async (e: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setImporting(true)
+    try {
+      const result = await importApi.importAita(file)
+      const msg = t('settings.importSuccess')
+        .replace('{trips}', String(result.importedTrips))
+        .replace('{flights}', String(result.importedFlights))
+      toast.success(msg)
+      if (typeof result.mergedConnections === 'number' && result.mergedConnections > 0) {
+        toast(`Merged ${result.mergedConnections} connecting leg(s) into single trips (<=24h layover).`)
+      }
+      if (Array.isArray(result.warnings) && result.warnings.length > 0) {
+        toast.warning(result.warnings.join('\n'))
+      }
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : t('settings.importError'))
+    } finally {
+      setImporting(false)
+      if (importFileRef.current) importFileRef.current.value = ''
     }
   }
 
@@ -559,6 +587,32 @@ export default function SettingsPage(): React.ReactElement {
               >
                 <Trash2 size={14} />
                 {t('settings.deleteAccount')}
+              </button>
+            </div>
+          </Section>
+
+          {/* Import Data */}
+          <Section title={t('settings.importData')} icon={Upload}>
+            <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+              {t('settings.importDataHint')}
+            </p>
+            <div>
+              <input
+                ref={importFileRef}
+                type="file"
+                accept=".txt,text/plain"
+                style={{ display: 'none' }}
+                onChange={handleImportAita}
+              />
+              <button
+                onClick={() => importFileRef.current?.click()}
+                disabled={importing}
+                className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-lg text-sm hover:bg-slate-700 disabled:bg-slate-400"
+              >
+                {importing
+                  ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  : <Upload className="w-4 h-4" />}
+                {importing ? t('settings.importing') : t('settings.importAita')}
               </button>
             </div>
           </Section>

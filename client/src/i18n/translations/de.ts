@@ -1056,6 +1056,14 @@ const de: Record<string, string> = {
   'collab.polls.options': 'Optionen',
   'collab.polls.delete': 'Löschen',
   'collab.polls.closedSection': 'Geschlossen',
+
+  'settings.importData': 'Daten importieren',
+  'settings.importDataHint': 'Vergangene Reisen aus einer externen Quelle importieren. Unterstützte Formate: App in the Air (data.txt).',
+  'settings.importAita': 'data.txt-Datei auswählen',
+  'settings.importing': 'Wird importiert…',
+  'settings.importSuccess': '{trips} Reise(n) und {flights} Flüge erfolgreich importiert.',
+  'settings.importError': 'Import fehlgeschlagen',
+  'settings.importEmpty': 'Keine Reisen in der Datei gefunden',
 }
 
 export default de
