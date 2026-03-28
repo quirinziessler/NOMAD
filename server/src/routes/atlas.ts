@@ -105,7 +105,7 @@ router.get('/stats', (req: Request, res: Response) => {
   const reservations = db.prepare(`
     SELECT trip_id, location, type
     FROM reservations
-    WHERE trip_id IN (${placeholders})
+    WHERE trip_id IN (${placeholders}) AND type = 'flight' AND location IS NOT NULL
   `).all(...tripIds) as { trip_id: number; location: string | null; type: string | null }[];
 
   interface CountryEntry { code: string; places: { id: number; name: string; lat: number | null; lng: number | null }[]; tripIds: Set<number> }
