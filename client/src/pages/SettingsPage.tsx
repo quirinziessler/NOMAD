@@ -175,7 +175,7 @@ export default function SettingsPage(): React.ReactElement {
         toast.warning(result.warnings.join('\n'))
       }
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : t('settings.importError'))
+      toast.error(getApiErrorMessage(err, t('settings.importError')))
     } finally {
       setImporting(false)
       if (importFileRef.current) importFileRef.current.value = ''
