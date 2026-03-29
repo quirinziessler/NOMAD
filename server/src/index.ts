@@ -116,7 +116,6 @@ import budgetRoutes from './routes/budget';
 import collabRoutes from './routes/collab';
 import backupRoutes from './routes/backup';
 import oidcRoutes from './routes/oidc';
-import importAitaRoutes from './routes/importAita';
 app.use('/api/auth', authRoutes);
 app.use('/api/auth/oidc', oidcRoutes);
 app.use('/api/trips', tripsRoutes);
@@ -154,7 +153,6 @@ app.use('/api/maps', mapsRoutes);
 app.use('/api/weather', weatherRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/backup', backupRoutes);
-app.use('/api/import/aita', importAitaRoutes);
 
 // Serve static files in production
 if (process.env.NODE_ENV === 'production') {
