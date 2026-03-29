@@ -1180,7 +1180,6 @@ const de: Record<string, string | { name: string; category: string }[]> = {
   'collab.polls.options': 'Optionen',
   'collab.polls.delete': 'Löschen',
   'collab.polls.closedSection': 'Geschlossen',
-
 }
 
 export default de
