@@ -96,9 +96,7 @@ function extractCountriesFromFlightReservation(reservation: FlightReservationRow
 
   if (reservation.metadata) {
     try {
-      const meta = typeof reservation.metadata === 'string'
-        ? JSON.parse(reservation.metadata)
-        : reservation.metadata;
+      const meta = JSON.parse(reservation.metadata as string);
 
       const departure = resolveCountryCodeForAirport(meta?.departure_airport ?? null);
       const arrival = resolveCountryCodeForAirport(meta?.arrival_airport ?? null);
